@@ -12,7 +12,6 @@ env:
 jobs:
   build-api:
     name: preview-api
-    if: github.repository == 'onlyutkarsh/knowledge-miner-svelte'
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
