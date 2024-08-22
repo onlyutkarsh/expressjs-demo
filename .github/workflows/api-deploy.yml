@@ -1,0 +1,74 @@
+name: api deployment
+
+on:
+  workflow_dispatch:
+  push: # needed to trigger the workflow - https://stackoverflow.com/a/63568873
+    branches-ignore:
+      - main
+
+env:
+  AZURE_WEBAPP_NAME: akmdemo
+
+jobs:
+  build-api:
+    name: preview-api
+    if: github.repository == 'onlyutkarsh/knowledge-miner-svelte'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: install node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: install dependencies
+        run: npm install
+
+      - name: build site
+        run: npm run build
+
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: api
+          path: ${{ github.workspace }}/dist
+
+  deploy-api:
+    runs-on: ubuntu-latest
+    needs: build-api
+    environment:
+      name: dev
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    # The id-token is used in combination with OpenID Connect.
+    # You won't be able to request the OIDC JWT ID token if the permissions setting for id-token is set to read
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: api
+          path: ${{ github.workspace }}/api
+
+      - name: print folder structure
+        run: |
+          tree ${{ github.workspace }}
+
+      - name: login to azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: "deploy to webapp"
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          startup-command: "node index.js"
+          package: ${{ github.workspace }}/api
