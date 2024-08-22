@@ -20,12 +20,6 @@ const fastify = Fastify(
   }
 );
 
-fastify.get("/", async (req, res) => {
-  return {
-    message: "Hello from Fastify Home!",
-  };
-});
-
 fastify.get("/fastify", async (req, res) => {
   return {
     message: "Hello from Fastify endpoint!",
