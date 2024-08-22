@@ -3,7 +3,7 @@ name: api deployment
 on:
   workflow_dispatch:
   push: # needed to trigger the workflow - https://stackoverflow.com/a/63568873
-    branches-ignore:
+    branches:
       - main
 
 env:
