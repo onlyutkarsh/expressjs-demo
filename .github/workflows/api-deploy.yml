@@ -29,14 +29,11 @@ jobs:
       - name: build site
         run: npm run build
 
-      - name: zip dist deployment
-        run: zip dist.zip ${{ github.workspace }}/dist -r
-
       - name: upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: api
-          path: dist.zip
+          path: dist
 
   deploy-api:
     name: deploy code
@@ -55,14 +52,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: api
-          path: ${{ github.workspace }}/api
-
-      - name: unzip artifact for deployment to output folder
-        run: unzip ${{ github.workspace }}/api/dist.zip -d ${{ github.workspace }}/out
+          path: ${{ github.workspace }}
 
       - name: print folder structure
         run: |
-          tree ${{ github.workspace }}/out -I node_modules
+          tree ${{ github.workspace }}
 
       - name: login to azure
         uses: azure/login@v2
@@ -77,4 +71,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           startup-command: "node index.js"
-          package: ${{ github.workspace }}/out
+          package: ${{ github.workspace }}/api

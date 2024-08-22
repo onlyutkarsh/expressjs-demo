@@ -1,7 +1,12 @@
 {
-  "watch": ["."],
-  "ignore": ["node_modules/**", "dist/**"],
+  "watch": [
+      "."
+  ],
+  "ignore": [
+      "node_modules/**",
+      "dist/**"
+  ],
   "ext": "ts,mjs,js,json,graphql",
-  "exec": "tsc -p . && node dist/index.js",
+  "exec": "esbuild $(find . -path './node_modules' -prune -o -name '*.ts' -print) --platform=node --outdir=dist --format=cjs && node dist",
   "legacyWatch": true
 }

@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc -p . && npm run copy-dependencies",
-    "copy-dependencies": "cp -r node_modules dist && cp package.json dist"
+    "build": "esbuild $(find . -path './node_modules' -prune -o -name '*.ts' -print) --platform=node --outdir=dist --format=cjs --bundle && cp package.json dist && cp ./src/index.html dist"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +17,7 @@
     "typescript": "^5.5.4"
   },
   "devDependencies": {
+    "esbuild": "^0.23.1",
     "nodemon": "^3.1.4"
   }
 }
