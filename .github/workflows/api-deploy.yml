@@ -11,7 +11,7 @@ env:
 
 jobs:
   build-api:
-    name: preview-api
+    name: build code
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
@@ -29,13 +29,17 @@ jobs:
       - name: build site
         run: npm run build
 
+      - name: zip dist deployment
+        run: zip dist.zip ${{ github.workspace }}/dist -r
+
       - name: upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: api
-          path: ${{ github.workspace }}/dist
+          path: dist.zip
 
   deploy-api:
+    name: deploy code
     runs-on: ubuntu-latest
     needs: build-api
     environment:
@@ -53,9 +57,12 @@ jobs:
           name: api
           path: ${{ github.workspace }}/api
 
+      - name: unzip artifact for deployment to output folder
+        run: unzip ${{ github.workspace }}/api/dist.zip -d ${{ github.workspace }}/out
+
       - name: print folder structure
         run: |
-          tree ${{ github.workspace }}
+          tree ${{ github.workspace }}/out -I node_modules
 
       - name: login to azure
         uses: azure/login@v2
@@ -70,4 +77,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           startup-command: "node index.js"
-          package: ${{ github.workspace }}/api
+          package: ${{ github.workspace }}/out
