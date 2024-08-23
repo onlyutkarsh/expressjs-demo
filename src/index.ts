@@ -4,6 +4,11 @@ const port = process.env.PORT || 3000;
 
 import Fastify from "fastify";
 
+var options = {
+  index: 'index.html'
+};
+app.use('/', express.static('/home/site/wwwroot', options)); // https://stackoverflow.com/a/54248175
+
 app.get("/express", (req, res) => {
   res.send({
     message: "Hello from Express!",
