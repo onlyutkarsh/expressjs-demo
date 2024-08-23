@@ -15,6 +15,12 @@ app.get("/express", (req, res) => {
   });
 });
 
+app.get("/api/chat/express", (req, res) => {
+  res.send({
+    message: "Hello from Express Chat!",
+  });
+});
+
 app.listen(port, () => {
   console.log(`Express Server is at http://localhost:${port}`);
 });
